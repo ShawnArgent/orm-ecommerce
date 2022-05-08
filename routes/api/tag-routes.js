@@ -2,13 +2,15 @@ const router = require("express").Router();
 const { Tag, Product, ProductTag } = require("../../models");
 
 router.get("/", (req, res) => {
+  // find all tags
+  // be sure to include its associated Product data
   Tag.findAll({
-    include: [
+    include: 
       {
         model: Product,
-        attributes: ["id", "product_name", "price", "stock", "category_id"],
-      },
-    ],
+        attributes: ["product_name", "price", "stock", "category_id"]
+      }
+    
   })
     .then((dbTagData) => res.json(dbTagData))
     .catch((err) => {
@@ -18,34 +20,27 @@ router.get("/", (req, res) => {
 });
 
 router.get("/:id", (req, res) => {
+  // find a single tag by its `id`
+  // be sure to include its associated Product data
   Tag.findOne({
     where: {
-      id: req.params.id,
+      id: req.params.id
     },
-    include: [
-      {
-        model: Product,
-        attributes: ["id", "product_name", "price", "stock", "category_id"],
-      },
-    ],
+    include: {
+      model: Product,
+      attributes: ['product_name', 'price', 'stock', 'category_id']
+    }
   })
-    .then((dbTagData) => {
-      if (!dbTagData) {
-        res.status(404).json({ message: "No tag with this id found" });
-        return;
-      }
-      res.json(dbTagData);
-    })
-    .catch((err) => {
+    .then(dbTagData => res.json(dbTagData))
+    .catch(err => {
       console.log(err);
       res.status(500).json(err);
     });
 });
-
 // create new product
 router.post("/", (req, res) => {
   Tag.create({
-    tag_name: req.body.taag_name,
+    tag_name: req.body.tag_name
   })
     .then((dbTagData) => res.json(dbTagData))
     .catch((err) => {
@@ -58,8 +53,8 @@ router.put("/:id", (req, res) => {
   // update product data
   Tag.update(req.body, {
     where: {
-      id: req.params.id,
-    },
+      id: req.params.id
+    }
   })
     .then((dbTagData) => {
       if (!dbTagData[0]) {
@@ -78,8 +73,8 @@ router.delete("/:id", (req, res) => {
   // delete one product by its `id` value
   Tag.destroy({
     where: {
-      id: req.params.id,
-    },
+      id: req.params.id
+    }
   })
     .then((dbTagData) => {
       if (!dbTagData) {
